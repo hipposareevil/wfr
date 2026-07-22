@@ -3,6 +3,8 @@ const ASSETS = [
   './',
   './index.html',
   './manifest.json',
+  './favicon.png',
+  './icon-192.png',
   './diagrams/diagram-sling-swathe-clean.jpg',
   './diagrams/diagram-lower-leg-splint.png',
   './diagrams/diagram-buddy-tape-finger.png',
