@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0f1419">
+<link rel="manifest" href="manifest.json">
+<title>First Aid Reference</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0f1419;color:#e7e9ea}
+#app{display:flex;flex-direction:column;height:100%;height:100dvh}
+.tab-content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 0 0}
+.tab-content>:last-child{margin-bottom:40px}
+.tab-bar{display:flex;border-top:1px solid #2f3336;background:#15181c;padding-bottom:env(safe-area-inset-bottom,0)}
+.tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 0 6px;border:none;background:none;color:#71767b;font-size:9px;font-weight:600;cursor:pointer}
+.tab-btn.active{color:#1d9bf0}
+.tab-btn .ico{font-size:20px;margin-bottom:2px}
+
+.card{background:#1a1f25;border-radius:12px;margin:6px 16px;overflow:hidden;border:1px solid #2f3336}
+.card-header{padding:16px;cursor:pointer;-webkit-user-select:none;user-select:none}
+.card-header:active{opacity:.7}
+.title-row{display:flex;justify-content:space-between;align-items:flex-start}
+.card-title{font-size:18px;font-weight:700;color:#e7e9ea}
+.card-subtitle{font-size:13px;color:#71767b;margin-top:2px}
+.card-summary{font-size:13px;color:#8b98a5;margin-top:4px}
+.chevron{font-size:18px;color:#71767b;margin-left:8px;flex-shrink:0}
+.letter-preview{font-size:14px;color:#1d9bf0;margin-top:8px;font-weight:600}
+.card-body{padding:0 16px 16px;display:none}
+.card.open .card-body{display:block}
+.context{font-size:13px;color:#8b98a5;margin-bottom:8px;font-style:italic}
+.mantra{font-size:13px;color:#f7c948;margin-bottom:12px;font-style:italic;font-weight:600}
+
+.step-row{display:flex;align-items:flex-start;margin-bottom:6px}
+.step-num{width:22px;height:22px;border-radius:11px;background:#1d3a5c;display:flex;justify-content:center;align-items:center;margin-right:10px;flex-shrink:0;margin-top:1px}
+.step-num-text{font-size:12px;font-weight:700;color:#1d9bf0}
+.step-text{flex:1;font-size:13px;color:#c4cdd5;line-height:20px}
+
+.letter-row{display:flex;align-items:center;padding:10px 0;border-top:1px solid #2f3336;cursor:pointer;-webkit-user-select:none;user-select:none}
+.letter-row:active{opacity:.7}
+.letter-badge{width:36px;height:36px;border-radius:18px;background:#1d3a5c;display:flex;justify-content:center;align-items:center;margin-right:12px;flex-shrink:0}
+.letter-text{font-size:16px;font-weight:700;color:#1d9bf0}
+.step-word{font-size:15px;font-weight:600;color:#e7e9ea}
+.step-summary{font-size:13px;color:#8b98a5;margin-top:2px}
+.letter-chevron{font-size:14px;color:#71767b;margin-left:8px;flex-shrink:0}
+.letter-detail{background:#141a20;padding:12px;border-radius:8px;margin:0 0 4px 48px;display:none}
+.letter-detail.open{display:block}
+.detail-text{font-size:13px;color:#c4cdd5;line-height:20px}
+.warning-box{background:#3d2008;padding:10px;border-radius:6px;margin-top:8px;border-left:3px solid #f7c948}
+.warning-text{font-size:13px;color:#f7c948;font-weight:600}
+.technique-box{background:#1a2332;padding:10px;border-radius:6px;margin-top:8px}
+.technique-name{font-size:14px;font-weight:700;color:#1d9bf0}
+.technique-use{font-size:12px;color:#71767b;margin-top:2px;margin-bottom:6px}
+.technique-step{font-size:13px;color:#c4cdd5;line-height:20px;margin-left:4px}
+
+.section-title{font-size:12px;font-weight:700;color:#71767b;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;margin-top:12px}
+.bullet{font-size:13px;color:#c4cdd5;line-height:22px}
+.badge{margin-left:8px;padding:2px 8px;border-radius:10px;display:inline-block}
+.badge-text{font-size:11px;font-weight:600;text-transform:uppercase}
+
+.decision-box{background:#141a20;padding:12px;border-radius:8px;margin-bottom:8px;border-left:3px solid #1d9bf0}
+.decision-q{font-size:14px;font-weight:600;color:#e7e9ea;margin-bottom:6px}
+.decision-yes{font-size:13px;color:#2ecc71;margin-bottom:2px}
+.decision-no{font-size:13px;color:#e74c3c}
+
+.type-row{background:#141a20;padding:10px;border-radius:6px;margin-bottom:4px}
+.type-label{font-size:14px;font-weight:600;color:#e7e9ea}
+.type-detail{font-size:13px;color:#8b98a5;margin-top:2px}
+.type-note{font-size:12px;color:#f7c948;margin-top:4px;font-style:italic}
+
+.wild-note{font-size:13px;color:#2ecc71;line-height:22px}
+.evac-text{font-size:13px;color:#e74c3c;line-height:22px}
+.mistake-text{font-size:13px;color:#e74c3c;line-height:22px}
+.insight-box{background:#1a2332;padding:10px;border-radius:6px;margin-top:12px}
+.insight-text{font-size:13px;color:#1d9bf0;line-height:20px}
+.exception-box{background:#1a2332;padding:10px;border-radius:6px;margin-top:4px}
+.exception-sit{font-size:13px;font-weight:600;color:#e7e9ea}
+.exception-act{font-size:13px;color:#2ecc71;margin-top:2px}
+.location-box{background:#141a20;padding:10px;border-radius:6px;margin-top:4px}
+.location-name{font-size:14px;font-weight:600;color:#e7e9ea}
+.location-detail{font-size:13px;color:#c4cdd5;margin-top:4px;line-height:20px}
+
+.fast-box{background:#141a20;padding:12px;border-radius:8px;border-left:3px solid #e74c3c}
+.fast-row{display:flex;align-items:center;margin-top:8px}
+.fast-badge{width:32px;height:32px;border-radius:16px;background:#5c1a1a;display:flex;justify-content:center;align-items:center;margin-right:10px;flex-shrink:0}
+.fast-letter{font-size:16px;font-weight:700;color:#e74c3c}
+.fast-word{font-size:14px;font-weight:600;color:#e7e9ea}
+.fast-test{font-size:12px;color:#8b98a5;margin-top:1px}
+
+.epi-box{background:#2a1015;padding:12px;border-radius:8px;margin-top:12px;border-left:3px solid #e74c3c}
+.epi-box .step-num{background:#5c1a1a}
+.epi-box .step-num-text{color:#e74c3c}
+.note-box{background:#1a2332;padding:10px;border-radius:6px;margin-top:12px}
+.note-text{font-size:13px;color:#1d9bf0;line-height:20px}
+
+.info-box{margin:0 16px 8px;padding:14px;border-radius:12px;border-left:3px solid}
+.info-box.green{background:#1a2332;border-left-color:#2ecc71}
+.info-box.blue{background:#1a2332;border-left-color:#1d9bf0}
+.info-box.orange{background:#1a2332;border-left-color:#e67e22}
+.info-title{font-size:14px;font-weight:700}
+.info-text{font-size:13px;color:#c4cdd5;margin-top:4px;line-height:20px}
+
+.splint-injuries{font-size:12px;color:#1d9bf0;margin-top:4px}
+.diagram-container{background:#141a20;border-radius:8px;margin-bottom:12px;overflow:hidden;cursor:pointer}
+.diagram-container img{width:100%;display:block}
+.tap-hint{font-size:10px;color:#4a5568;text-align:center;padding:6px 0}
+.improv-box{background:#1a2332;padding:10px;border-radius:6px;margin-top:12px}
+.improv-text{font-size:13px;color:#2ecc71;line-height:20px}
+
+.flow-box{background:#1a1f25;border-radius:12px;margin:6px 16px;padding:16px;border:1px solid #2f3336}
+.flow-title{font-size:16px;font-weight:700;color:#e7e9ea;margin-bottom:12px}
+.flow-box img{width:100%;border-radius:8px;display:block;cursor:pointer}
+
+.search-container{margin:0 16px 8px;z-index:10;position:relative}
+.search-row{display:flex;align-items:center;background:#1a1f25;border-radius:12px;border:1px solid #2f3336;padding:0 12px;height:44px}
+.search-icon{font-size:14px;margin-right:8px}
+.search-input{flex:1;background:none;border:none;outline:none;color:#e7e9ea;font-size:14px;height:44px}
+.search-input::placeholder{color:#4a5568}
+.search-clear{color:#71767b;font-size:16px;padding-left:8px;cursor:pointer;background:none;border:none}
+.results-box{background:#1a1f25;border-radius:12px;border:1px solid #2f3336;margin-top:4px;max-height:300px;overflow-y:auto}
+.result-item{padding:12px;border-bottom:1px solid #2f3336}
+.result-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.result-title{font-size:15px;font-weight:600;color:#e7e9ea;flex:1}
+.section-badge{padding:2px 8px;border-radius:10px;margin-left:8px}
+.section-badge-text{font-size:10px;font-weight:600;text-transform:uppercase}
+.match-text{font-size:12px;color:#8b98a5;line-height:18px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.highlight{color:#1d9bf0;font-weight:600}
+.no-results{color:#71767b;font-size:13px;padding:16px;text-align:center}
+
+.zoom-overlay{position:fixed;inset:0;background:#000;z-index:100;display:none;flex-direction:column}
+.zoom-overlay.open{display:flex}
+.zoom-close{align-self:flex-end;padding:12px 20px;color:#e7e9ea;font-size:16px;font-weight:600;cursor:pointer;background:none;border:none;z-index:101}
+.zoom-scroll{flex:1;overflow:auto;display:flex;justify-content:center;align-items:center;-webkit-overflow-scrolling:touch}
+.zoom-scroll img{max-width:100%;max-height:100%;object-fit:contain;touch-action:pinch-zoom}
+.zoom-hint{padding:14px;text-align:center;color:#71767b;font-size:12px}
+
+.attribution{margin:12px 16px;padding:10px}
+.attribution-text{font-size:10px;color:#4a5568;line-height:16px;text-align:center}
+
+.header-box{margin:0 16px 8px;padding:14px;border-radius:12px;background:#1a2332;border-left:3px solid #e67e22}
+.header-title{font-size:16px;font-weight:700;color:#e67e22}
+.header-text{font-size:13px;color:#c4cdd5;margin-top:4px;line-height:20px}
+
+.burn-field b{font-weight:600;color:#e7e9ea}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="tab-quickref" class="tab-content"></div>
+  <div id="tab-protocols" class="tab-content" style="display:none"></div>
+  <div id="tab-splints" class="tab-content" style="display:none"></div>
+  <div id="tab-medical" class="tab-content" style="display:none"></div>
+  <div id="tab-wfr" class="tab-content" style="display:none"></div>
+  <nav class="tab-bar">
+    <button class="tab-btn active" data-tab="quickref"><span class="ico">&#9889;</span>Quick Ref</button>
+    <button class="tab-btn" data-tab="protocols"><span class="ico">&#129657;</span>Protocols</button>
+    <button class="tab-btn" data-tab="splints"><span class="ico">&#129460;</span>Splints</button>
+    <button class="tab-btn" data-tab="medical"><span class="ico">&#127973;</span>Medical</button>
+    <button class="tab-btn" data-tab="wfr"><span class="ico">&#9968;</span>WFR</button>
+  </nav>
+</div>
+<div class="zoom-overlay" id="zoom-overlay">
+  <button class="zoom-close" id="zoom-close">&times; Close</button>
+  <div class="zoom-scroll" id="zoom-scroll">
+    <img id="zoom-img" src="" alt="Zoom">
+  </div>
+  <div class="zoom-hint">Pinch to zoom &middot; Tap close to exit</div>
+</div>
+<script>
+// === DATA ===
+const DATA = {
+  acronyms: [
+    {
+      id:"drsabcd",title:"DRSABCD",subtitle:"Primary Response Framework",
+      context:"NZ / St John standard. Your first framework at any emergency scene.",
+      mantra:"Walk — don't run. Slow is smooth, smooth is fast.",
+      steps:[
+        {letter:"D",word:"Danger",summary:"Check for anything and everything that could harm you, the patient, or bystanders.",detail:"Look for: traffic, fire, electricity, unstable structures, hostile people, weapons, toxic chemicals, weather. Do not enter an unsafe scene. If danger exists, eliminate or reduce it first — or wait for help.",warning:"A dead rescuer helps no one."},
+        {letter:"R",word:"Response",summary:"Shout and tap. Check if the patient is conscious.",detail:"Shout: 'Are you okay?' Tap shoulders firmly. Note any signs of confusion or altered response. If responsive — they have a pulse and are breathing. If unresponsive — immediately progress to S."},
+        {letter:"S",word:"Send for Help",summary:"Call 111. Get the first aid kit and AED if available.",detail:"Call 111 (NZ emergency). Tell someone specific to call — point and name them. Send for: first aid kit, 2× defibrillators if available. If alone with an unresponsive adult, call first then start CPR. With a child, give 1 min CPR first then call."},
+        {letter:"A",word:"Airway",summary:"Open the airway. Check the mouth.",detail:"Tilt head, lift chin (head-tilt/chin-lift). Look inside mouth for visible obstructions — vomit, broken teeth, blood. Remove visible objects only. DO NOT perform blind finger sweep. If suspected spinal injury: use jaw-thrust instead.",techniques:[{name:"Head-Tilt / Chin-Lift",use:"Default — no suspected spinal injury",steps:["Place one hand on forehead, apply firm backward pressure","Place fingertips under bony tip of lower jaw","Lift chin upward — keep mouth slightly open"]},{name:"Jaw-Thrust",use:"Suspected spinal/neck injury (head or neck trauma, blast, MVA)",steps:["Kneel at head of patient, elbows on ground","Forearms along patient's head to stabilize — do not rotate neck","Fingers under jaw line below ears, thumbs on chin","Pull lower jaw upward and forward"]}]},
+        {letter:"B",word:"Breathing",summary:"Look, listen, feel for breathing.",detail:"Look: rise and fall of chest. Listen: breath sounds, gurgling, wheezing. Feel: air movement on your cheek. Normal breathing = do not start CPR. Not breathing / abnormal breathing = start CPR."},
+        {letter:"C",word:"Circulation / CPR",summary:"If not breathing — start CPR. Control severe bleeding first.",detail:"Fix severe bleeding before airway if bleeding is immediately life-threatening. Then: 30 compressions, 2 rescue breaths. Rate: 100–120 beats per minute. Depth: 1/3 of chest. Continue until patient recovers, AED arrives, you are exhausted, or scene becomes unsafe."},
+        {letter:"D",word:"Defibrillation",summary:"Apply AED as soon as available. Minimise interruptions.",detail:"Turn on AED and follow voice prompts. Apply pads to bare chest (one below right collarbone, one on left side below armpit). Ensure no one is touching patient when analysing or shocking. Resume CPR immediately after shock — do not pause to check pulse."}
+      ]
+    },
+    {
+      id:"avpu",title:"AVPU",subtitle:"Level of Consciousness (LOC)",
+      context:"Used during ongoing assessment to track neurological status. Assess frequently and note changes.",
+      steps:[
+        {letter:"A",word:"Alert",summary:"Patient is awake, eyes open, aware of surroundings.",detail:"Eyes open spontaneously. Responds appropriately to questions. Oriented to person, place, time, events."},
+        {letter:"V",word:"Voice",summary:"Patient responds only when spoken to.",detail:"Eyes may open to voice. May follow simple commands or answer questions, but not spontaneously alert. Note quality of response — confused? Slurred?"},
+        {letter:"P",word:"Pain",summary:"Patient responds only to painful stimulus.",detail:"Does not respond to voice. Reacts to sternal rub or nail-bed pressure — withdrawal, grimacing, or purposeful movement counts as response."},
+        {letter:"U",word:"Unresponsive",summary:"No response to any stimulus.",detail:"No eye opening, no verbal response, no movement. If unresponsive and not breathing normally — start CPR."}
+      ]
+    },
+    {
+      id:"soap",title:"SOAP",subtitle:"Medical Documentation",
+      context:"Standard format for documenting what happened and what you did. Use for handover to EMS.",
+      steps:[
+        {letter:"S",word:"Subjective",summary:"What the patient tells you.",detail:"Chief complaint in patient's own words. Pain description using OPQRST: Onset, Provocation/palliation, Quality, Radiation, Severity (0–10), Time. Include: symptoms, how the injury happened."},
+        {letter:"O",word:"Objective",summary:"What you observe and measure.",detail:"Vitals: pulse (rate + quality), respirations (rate + quality), skin (colour, temp, moisture), AVPU level, pupils. Physical exam findings. What you can see, feel, hear."},
+        {letter:"A",word:"Assessment",summary:"Your conclusion — what do you think is wrong?",detail:"List of injuries or medical problems identified. e.g. 'suspected fractured radius, mild shock, no spinal injury identified'. Your working diagnosis based on S and O."},
+        {letter:"P",word:"Plan",summary:"What you did and what happens next.",detail:"Treatments applied (tourniquet at 14:32, wound packed, splint applied). Evacuation decision. Ongoing monitoring plan. Handover notes."}
+      ]
+    },
+    {
+      id:"sample",title:"SAMPLE",subtitle:"Patient History",
+      context:"Used during secondary survey to build patient history. Often combined with OPQRST for pain assessment.",
+      steps:[
+        {letter:"S",word:"Signs & Symptoms",summary:"What do you see? What does the patient feel?"},
+        {letter:"A",word:"Allergies",summary:"Any drug, food, or environmental allergies?"},
+        {letter:"M",word:"Medications",summary:"Current medications (prescription, OTC, supplements)?"},
+        {letter:"P",word:"Past Medical History",summary:"Relevant medical history, previous surgeries?"},
+        {letter:"L",word:"Last In / Last Out / Last Dr's Visit",summary:"Last food and drink. Last bowel movement. Last medical visit."},
+        {letter:"E",word:"Events Prior",summary:"What were they doing before this happened?"}
+      ]
+    },
+    {
+      id:"4bs",title:"4 B's",subtitle:"Quick Scene Triage Priorities",
+      context:"Quick mental checklist when first approaching any scene. What are the immediate threats?",
+      steps:[
+        {letter:"B",word:"Breathing",summary:"Is the patient breathing? Airway open?"},
+        {letter:"B",word:"Bleeding",summary:"Any life-threatening external bleeding?"},
+        {letter:"B",word:"Burns",summary:"Any thermal, chemical, electrical or radiation burns?"},
+        {letter:"B",word:"Breaks",summary:"Any obvious fractures or deformities?"}
+      ]
+    },
+    {
+      id:"march",title:"MARCH",subtitle:"WFR/Tactical Priority Sequence",
+      context:"Used in wilderness and tactical settings. Prioritises life threats in order. Stop and fix each problem before moving on.",
+      steps:[
+        {letter:"M",word:"Massive Bleeding",summary:"Stop life-threatening bleeding first — before airway.",detail:"Look for: pulsating or steady bleeding, blood pooling, saturated clothing, amputation. Apply tourniquet for extremity bleeding. For wounds where tourniquet can't be used (groin, armpit, neck): wound packing + pressure bandage."},
+        {letter:"A",word:"Airway",summary:"Open and maintain the airway. C-spine precautions if trauma.",detail:"If unresponsive, assume C-spine injury until proven otherwise. Use jaw-thrust if trauma mechanism. Look, listen, feel. Recovery position for unconscious breathing patients."},
+        {letter:"R",word:"Respiration",summary:"Assess breathing quality. Look for chest injuries.",detail:"Expose chest and back. Look for penetrating injuries. Signs of open chest wound: sucking/hissing sound, difficulty breathing, froth, coughing blood. Cover open chest wound with 3-sided dressing."},
+        {letter:"C",word:"Circulation",summary:"Monitor for shock. Recheck all dressings and tourniquets.",detail:"Shock signs: rapid breathing, pale/grey/clammy skin, confusion, losing focus. Reassess every tourniquet — expose and check, mark time applied. Check pulse distal to tourniquet (should be absent). Prevention >> treatment."},
+        {letter:"H",word:"Hypothermia",summary:"Keep patient warm and dry.",detail:"Get patient off cold ground onto insulated surface. Remove wet clothing, keep dry layers on. Cover with jackets, sleeping bags, emergency blanket — anything that retains heat. Hypothermia worsens bleeding outcomes significantly."}
+      ]
+    }
+  ],
+  protocols: [
+    {id:"cpr",title:"CPR",category:"cardiac",summary:"30:2 — no matter who. 100–120 bpm. 1/3 chest depth.",steps:["Confirm unresponsive and not breathing normally","Call 111 / send someone for AED","Position patient on back on firm flat surface","Heel of hand on centre of chest (lower half of sternum)","Second hand on top, fingers interlaced","Arms straight, compress 1/3 depth of chest","30 compressions at 100–120 bpm (think: Stayin' Alive)","2 rescue breaths — tilt head, pinch nose, seal lips, 1 second each, watch chest rise","Continue 30:2 until AED arrives, patient recovers, or you are relieved"],wilderness_notes:["In wilderness, if no AED is coming, continue CPR for 30 min in non-hypothermic patient before ceasing","Hypothermic patients may survive prolonged CPR — continue until warm","Submersion injuries: oxygen is critical — rescue breaths are not optional"],when_not_to_start:["Obvious signs of death (rigor mortis, decapitation, decomposition)","Injuries clearly incompatible with life","Valid advance directive or DNR","Scene is unsafe and cannot be made safe","Patient has been submerged in warm water for extended confirmed time"]},
+    {id:"choking",title:"Choking",category:"airway",summary:"Ask 'Are you choking?' — 'Can you cough?' — 5 back blows, 5 chest thrusts.",decision_tree:[{question:"Can they cough / speak / cry?",yes:"Encourage strong coughing. Monitor closely. Do not intervene yet.",no:"Proceed to back blows immediately."}],steps:["Ask: 'Are you choking? Can you cough?'","Send for help — call 111","Lean patient forward, support chest with one hand","5 firm back blows between shoulder blades with heel of hand","Check mouth — remove any visible object","If still choking: 5 chest thrusts (same position as CPR compressions but sharper)","Alternate 5 back blows / 5 chest thrusts until object clears or patient loses consciousness","If unconscious: lower to ground, call 111, start CPR"],infant_note:"For infants: 5 back blows face-down on your forearm, 5 chest thrusts (2 fingers, centre of chest). Never abdominal thrusts on infants."},
+    {id:"bleeding",title:"Bleeding Control",category:"trauma",summary:"Rest & Reassure → Expose & Evaluate → Direct Pressure & Dressing → Tourniquet if needed.",decision_tree:[{question:"Is bleeding life-threatening? (pulsatile, pooling, saturated clothing, amputation)",yes:"Apply tourniquet immediately if extremity. Wound pack if junction wound.",no:"Direct pressure, dressing, elevation."},{question:"Is the wound on an arm or leg (where tourniquet can be applied)?",yes:"Tourniquet 2–3 inches above wound. High and tight if wound site unclear.",no:"Wound packing + pressure bandage (groin, armpit, neck)."}],steps:["Rest and reassure patient","Expose and evaluate — cut away clothing to see the wound","Apply direct pressure with gloved hand","If minor: maintain pressure, apply dressing","If not controlled: apply tourniquet (extremity) or wound pack (junction)"]},
+    {id:"tourniquet",title:"Tourniquet Application (CAT)",category:"trauma",summary:"Apply 2–3 inches above wound. Tighten until bleeding stops. Mark time. Do not remove.",steps:["Slide limb through tourniquet loop","Position 2–3 inches above wound — over clothing is fine if needed","Do NOT place over a joint (knee, elbow, wrist)","Pull self-adhering band as tight as possible — fasten back on itself","Twist windlass rod until bleeding stops","Check: no pulse distal to tourniquet (should be gone)","Lock windlass rod into clip","Route and secure band under safety strap","Write time of application on strap / patient's forehead","Reassess every 2–5 minutes — tighten if needed"],warnings:["A properly applied tourniquet WILL hurt — that's correct","Do not loosen or remove once applied","Stop bleeding within 1 minute of starting application","If first tourniquet fails: apply second tourniquet immediately above first","Mark time clearly — surgical team needs this information"],common_mistakes:["Not using one when indicated","Waiting too long","Not pulling slack before tightening windlass (too loose)","Placing over a joint","Not tightening enough — allows arterial flow while occluding venous return (makes it worse)","Periodically loosening (don't)"]},
+    {id:"wound-packing",title:"Wound Packing",category:"trauma",summary:"For wounds where tourniquet cannot be applied: groin, armpit, neck. Pack tightly, hold 3 minutes.",steps:["Expose wound — cut away clothing","Locate most active bleeding point","Remove hemostatic dressing from sterile package","Pack tightly into wound directly over bleeding source","Fill entire wound cavity — more than one gauze may be needed","Apply firm manual pressure — minimum 3 minutes continuous","Do NOT remove packed gauze — mound additional gauze on top if needed","Apply pressure bandage over packed wound to secure","Monitor for re-bleeding"],warnings:["If an object is impaled in the wound — pack around it, do not remove","Bleeding re-soaking through dressing = apply more gauze on top, increase pressure"]},
+    {id:"impaled-objects",title:"Impaled Objects",category:"trauma",summary:"Leave in place. Stabilise. Do not remove. Notable exceptions: airway obstruction, fishhooks.",steps:["Do NOT remove the object","Control bleeding around the object","Stabilise object in place — use bulky dressings in a donut/ring shape around it","Tape the dressing and object to prevent movement","If object is very long: carefully shorten it only if needed for safe evacuation","Evacuate — all impaled objects require medical evaluation"],exceptions:[{situation:"Object blocking the airway",action:"Remove — airway takes priority"},{situation:"Fishhook",action:"Can be removed: apply light downward pressure and tug sharply. Do NOT attempt on eye."}],by_location:[{location:"Chest wall",detail:"Stabilise in place. Treat for sucking chest wound (3-sided dressing). Shorten only if required for evacuation. Rapid evacuation."},{location:"Eye",detail:"Do not remove. Do not apply pressure. Donut dressing around eye, cup/glasses taped over it. Patch other eye to reduce movement. Immediate evacuation."},{location:"Abdomen",detail:"Do not remove. Stabilise. Keep patient still. Immediate evacuation."}]},
+    {id:"open-chest-wound",title:"Open Chest Wound (Sucking Chest Wound)",category:"trauma",summary:"Cover with 3-sided dressing or vented chest seal. Position on injured side.",signs:["Sucking or hissing sound when patient inhales","Difficulty breathing","Puncture wound to chest","Froth or bubbles around injury","Coughing up blood","Pain in chest or shoulder"],steps:["Follow MARCH / ABCDEs","Expose chest — look front and back for entry and exit wounds","Cover wound with 3-sided dressing (tape 3 sides, leave one side open as flutter valve)","Alternatively: manufactured vented chest seal","Position patient on injured side if no preference — this helps breathing","Monitor for tension pneumothorax (worsening breathing, shock)","Evacuate urgently"]},
+    {id:"shock",title:"Shock Recognition & Treatment",category:"medical",summary:"Recognise early. Prevention is far better than treatment. Control bleeding, lay flat, keep warm.",signs:["Rapid, shallow breathing","Pale, grey, or ashy skin","Cool, clammy, sweaty skin","Rapid weak pulse","Confusion, losing focus, anxiety","Nausea / vomiting","Altered AVPU level"],steps:["Control all external bleeding immediately","Lay patient flat — legs elevated if no spinal concern and tolerated","Keep warm — hypothermia worsens shock","Calm and reassure","Small sips of water only if: patient is conscious, managing own airway, long-term care situation, and not nauseous","Do NOT give fluids if: unconscious, suspected internal bleeding, vomiting, surgery likely soon","Monitor AVPU continuously — deterioration = urgent evacuation","Call for evacuation early"]},
+    {id:"burns",title:"Burns",category:"trauma",summary:"Cool 20 mins (chemical: 1 hour). Clear. Cover with cling film. Do NOT cover chemical burns.",types:[{type:"Thermal",cause:"Heat, flame, steam"},{type:"Chemical ⚠️",cause:"Acids, alkalis, industrial chemicals",note:"Cool 1 hour — do NOT cover with cling film"},{type:"Electrical ⚠️",cause:"Current injury — may have entry and exit wounds",note:"Scene safety first — do not touch patient if still connected to source"},{type:"Radiation",cause:"Sun, UV, radiation exposure"}],burn_assessment:[{field:"Size",detail:"Use Rule of Nines or palm = 1%"},{field:"Cause",detail:"Thermal, chemical, electrical, radiation"},{field:"Age",detail:"Children and elderly — lower threshold for evacuation"},{field:"Location",detail:"Face, hands, feet, genitals, joints = serious. Airway burns = immediately life-threatening."},{field:"Depth",detail:"Superficial (red, painful), Partial thickness (blisters), Full thickness (white/black, painless)"}],steps:["Scene safety — especially electrical","Remove patient from source","Cool with cool running water for 20 minutes (chemical burns: 60 minutes)","Remove jewellery and clothing near burn — unless stuck to skin","Do not burst blisters","Cover loosely with cling film (wrap around, not circumferential) — do NOT cover chemical burns","Treat for shock and hypothermia","Evacuate for: facial burns, airway burns, hands/feet/genitals, full thickness, >10% body surface, chemical/electrical"]},
+    {id:"soft-tissue-injury",title:"Soft Tissue Injury (RICE)",category:"musculoskeletal",summary:"Rest 3 days. Ice 20 on / 2 hours off. Compression. Elevation.",steps:["Rest — 3 days minimum from aggravating activity","Ice — 20 minutes on, 2 hours off. Barrier between ice and skin.","Compression — elastic bandage, not too tight","Elevation — above heart level to reduce swelling"]},
+    {id:"wound-dressing",title:"Wound Cleaning & Dressing",category:"trauma",summary:"Irrigate aggressively. Keep moist. Daily dressing changes.",steps:["Expose wound — cut away clothing","Irrigate with high pressure: use syringe or bottle with pinhole — clean water is effective","Remove visible foreign matter (debris, dirt) — important for infection prevention","Do NOT irrigate with antiseptic directly (can damage tissue)","Apply antibiotic ointment (Bacitracin ideal — Neomycin can cause allergic reaction)","Cover with moist dressing — keeps wound moist, promotes healing","Secure with tape or bandage","Change dressing daily if possible","Honey (unprocessed) is an excellent field alternative — bacteriostatic, promotes healing"],key_insight:"Scabs slow healing. Keep wound moist for entire healing duration — grass doesn't grow under a rock.",evacuate_if:["Complex or mutilating wound","Grossly contaminated with penetrating debris","Laceration of eyelid, ear, or cartilage","Penetration of bone, joint, or tendon","Animal bites (hands, legs, feet)","Amputation","Signs of infection: redness, swelling, pain, warmth, discharge"]}
+  ],
+  splinting: [
+    {id:"sling-swathe",title:"Sling & Swathe",injuries:["Clavicle fracture","Shoulder dislocation","Humerus fracture","Shoulder injuries"],summary:"Support arm in sling. Swathe binds arm to body for additional stability.",steps:["Create sling: triangular bandage, shirt, or jacket","Pad behind neck to prevent pressure sore","Keep hand slightly above elbow level","Swathe: wrap bandage around arm and torso to bind arm in place","Check CSM: Circulation, Sensation, Movement — before and after"],improvised:"Safety-pin a sleeve to the chest of the jacket (shirt sling).",diagram:"diagrams/diagram-sling-swathe-clean.jpg"},
+    {id:"forearm-wrist",title:"Forearm / Wrist / Elbow",injuries:["Radius/ulna fracture","Wrist fracture","Elbow injury"],summary:"Rigid support elbow to hand. Sling and swathe to complete.",steps:["Never forcefully realign or reduce angulated fractures","Mold SAM splint (or improvised) on uninjured arm first","Place rolled gauze or sock in patient's hand — position of function (slight grip)","Pad all voids in splint","Immobilise from elbow to hand","If elbow injured: include humerus in splint","Complete with sling and swathe","Check CSM before and after"],diagram:"diagrams/diagram-forearm-splint.png"},
+    {id:"finger-toe",title:"Finger / Toe",injuries:["Fractured finger","Fractured toe"],summary:"Buddy splint — tape to adjacent finger.",steps:["Pad between fingers","Tape to adjacent finger — buddy splint","Alternatively: small rigid splint with tape","Check circulation in fingertip"],diagram:"diagrams/diagram-buddy-tape-finger.png"},
+    {id:"tibia-fibula",title:"Lower Leg (Tibia / Fibula)",injuries:["Tibia fracture","Fibula fracture","Boot-top fracture"],summary:"Immobilise with improvised splint. Elevate to reduce swelling.",steps:["Use available materials: ski poles, trekking poles, SAM splints, sleeping pad, backpack stays","Pad well — fill voids","Flex knee slightly, pad under knee void","Secure with straps, rope, or torn clothing","Elevate leg to reduce swelling","Check CSM (Circulation, Sensation, Movement) before and after","Seek medical care — do not walk on it"],diagram:"diagrams/diagram-lower-leg-splint.png"},
+    {id:"foot-ankle",title:"Foot / Ankle",injuries:["Ankle fracture","Foot fracture"],summary:"Foam sleeping pad or Crazy Creek chair works well. Legs together prevents rotation.",steps:["Immobilise with foam sleeping pad or similar","SAM splints also effective","Consider securing legs together to prevent foot rotation","Elevate","Check CSM"],diagram:"diagrams/diagram-foot-ankle-splint.png"}
+  ],
+  medical_emergencies: [
+    {id:"heart-attack",title:"Heart Attack",subtitle:"Coronary artery blockage",signs:["Chest pain / pressure / tightness","Pain radiating to arm, jaw, back","Shortness of breath","Sweating, nausea","Pale, clammy skin"],treatment:["Stop all activity — rest immediately","Call 111","Sit patient in comfortable position (W-sitting or semi-reclined)","Aspirin 300mg — chew (not swallow) if no allergy and conscious","Reassure","Be prepared to start CPR"],note:"Aspirin works by preventing further clot formation."},
+    {id:"angina",title:"Angina",subtitle:"Coronary artery restriction (not full blockage)",signs:["Chest pain / tightness on exertion","Eases with rest","Patient may have known history"],treatment:["Stop activity — rest","GTN spray (if patient has own prescription) — under tongue","Wait 10 minutes","If pain unresolved or worsening: treat as heart attack, call 111"]},
+    {id:"stroke",title:"Stroke",subtitle:"Brain clot or bleed",signs:["FAST: Face drooping, Arm weakness, Speech difficulty, Time to call 111"],fast_test:[{letter:"F",word:"Face",test:"Ask patient to smile — is one side drooping?"},{letter:"A",word:"Arms",test:"Ask patient to raise both arms — does one drift down?"},{letter:"S",word:"Speech",test:"Ask to repeat a phrase — is it slurred or strange?"},{letter:"T",word:"Time",test:"Call 111 immediately — time is brain"}],treatment:["Call 111 urgently — time critical","Note exact time symptoms started","Do not give food or drink","Recovery position if unconscious","Monitor and reassure"]},
+    {id:"diabetes",title:"Diabetes Emergency",subtitle:"Low blood sugar (hypoglycaemia) most likely in field",signs:["Confusion, bizarre behaviour","Sweating, shaking","Pale, weak","Patient may know they are 'low'"],treatment:["If conscious and able to swallow: give sugar — glucose tablets, juice, sweet drink, sweets","Wait 15 minutes — reassess","If improved: follow with complex carbohydrate (sandwich, crackers)","If unconscious or no improvement: call 111 — do not give anything by mouth"]},
+    {id:"seizure",title:"Seizure",subtitle:"Brain electrical issue",steps:["Call 111","Keep patient safe — remove hazards from area","Do NOT restrain — guide movements only","Do NOT put anything in mouth","Time the seizure","Recovery position when seizing stops","Monitor airway — patients may vomit","Stay until fully recovered — reassure (patient will be confused)"],evacuate_if:["First ever seizure","Seizure > 5 minutes","Multiple seizures without recovery","Injury during seizure","Pregnancy"]},
+    {id:"asthma",title:"Asthma Attack",subtitle:"Breathing problem — airway inflammation/constriction",signs:["Difficulty breathing / wheeze","Coughing","Chest tightness","Unable to speak in full sentences (severe)"],treatment:["Sit upright — do not lay down","Encourage slow, calm breathing","Use own reliever inhaler (blue/salbutamol): 1 puff, wait 1 minute, reassess","Up to 6 puffs if needed in severe attack","If spacer available: use it for better delivery","Call 111 if: no improvement after 6 puffs, or no inhaler available, or severe distress"]},
+    {id:"anaphylaxis",title:"Anaphylaxis",subtitle:"Severe allergic reaction — body-wide swelling problem",signs:["Sudden onset after exposure to trigger","Skin: hives, flushing, swelling (especially face, lips, throat)","Breathing: difficulty, wheeze, stridor","Circulation: rapid weak pulse, dizziness, collapse","GI: nausea, vomiting"],treatment:["Call 111 immediately","Adrenaline (Epi-Pen) — inject into outer mid-thigh, hold 10 seconds","Lay patient flat — legs elevated (unless breathing difficulty, then sit up)","Second Epi-Pen after 5–15 min if no improvement","Be prepared for CPR","Do not leave patient alone"],epipen_steps:["Remove blue safety cap","Hold orange tip against outer thigh (through clothing is fine)","Press firmly until click — hold 10 seconds","Remove and massage site","Note time given"]}
+  ],
+  abcdes: {
+    id:"abcdes",title:"ABCDEs",subtitle:"Systematic Patient Assessment",
+    context:"US WFR standard. Used for thorough primary survey after scene safety established.",
+    steps:[
+      {letter:"A",word:"Airway",summary:"Open and maintain. C-spine if trauma.",detail:"Head-tilt/chin-lift or jaw-thrust. Look, listen, feel. Suction or log-roll to clear."},
+      {letter:"B",word:"Breathing",summary:"Rate, rhythm, quality, effort.",detail:"Expose chest. Count rate. Look for symmetry, accessory muscle use, wounds. Auscultate if stethoscope available. Treat open chest wounds, tension pneumothorax."},
+      {letter:"C",word:"Circulation",summary:"Pulse, bleeding, perfusion, shock.",detail:"Radial pulse = systolic >80mmHg. Check skin colour, temp, moisture. Control all external bleeding. Assess for shock."},
+      {letter:"D",word:"Disability",summary:"Neuro status — AVPU, pupils, glucose.",detail:"AVPU level. Check pupils: equal, round, reactive to light (PERRL). Consider blood glucose if altered mental status. Note any focal deficits."},
+      {letter:"E",word:"Exposure / Environment",summary:"Full body exam. Protect from environment.",detail:"Expose patient for full assessment — front, back, head to toe. Protect from hypothermia immediately after. Log-roll for posterior exam. Document all findings."}
+    ]
+  }
+};
+
+// === HELPERS ===
+function h(tag, attrs, ...children) {
+  const el = document.createElement(tag);
+  if (attrs) for (const [k,v] of Object.entries(attrs)) {
+    if (k === 'className') el.className = v;
+    else if (k.startsWith('on')) el.addEventListener(k.slice(2).toLowerCase(), v);
+    else if (k === 'html') el.innerHTML = v;
+    else el.setAttribute(k, v);
+  }
+  for (const c of children.flat()) {
+    if (c == null) continue;
+    el.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+  }
+  return el;
+}
+
+// === ZOOM ===
+const zoomOverlay = document.getElementById('zoom-overlay');
+const zoomImg = document.getElementById('zoom-img');
+const zoomScroll = document.getElementById('zoom-scroll');
+document.getElementById('zoom-close').onclick = () => zoomOverlay.classList.remove('open');
+zoomOverlay.addEventListener('click', (e) => { if (e.target === zoomOverlay) zoomOverlay.classList.remove('open'); });
+
+function openZoom(src) {
+  zoomImg.src = src;
+  zoomOverlay.classList.add('open');
+}
+
+// === SEARCH ===
+function searchContent(query) {
+  if (query.length < 2) return [];
+  const q = query.toLowerCase();
+  const results = [];
+  const match = (texts) => texts.filter(t => t && t.toLowerCase().includes(q));
+
+  for (const a of DATA.acronyms) {
+    const m = match([a.title, a.subtitle, a.context, ...a.steps.map(s=>s.word), ...a.steps.map(s=>s.summary), ...a.steps.map(s=>s.detail||'')]);
+    if (m.length) results.push({section:'Quick Ref',title:a.title,matches:m});
+  }
+  for (const p of DATA.protocols) {
+    const m = match([p.title,p.summary,...(p.steps||[]),...(p.signs||[]),...(p.warnings||[]),...(p.wilderness_notes||[]),p.key_insight||'',...(p.decision_tree||[]).flatMap(d=>[d.question,d.yes,d.no]),...(p.evacuate_if||[])]);
+    if (m.length) results.push({section:'Protocols',title:p.title,matches:m});
+  }
+  for (const s of DATA.splinting) {
+    const m = match([s.title,s.summary,...s.injuries,...s.steps]);
+    if (m.length) results.push({section:'Splints',title:s.title,matches:m});
+  }
+  for (const me of DATA.medical_emergencies) {
+    const m = match([me.title,me.subtitle,...(me.signs||[]),...(me.treatment||[]),...(me.steps||[]),me.note||'',...(me.fast_test||[]).map(f=>f.word+' '+f.test),...(me.epipen_steps||[]),...(me.evacuate_if||[])]);
+    if (m.length) results.push({section:'Medical',title:me.title,matches:m});
+  }
+  return results;
+}
+
+function highlightMatch(text, query) {
+  const idx = text.toLowerCase().indexOf(query.toLowerCase());
+  if (idx === -1) return text;
+  return text.slice(0,idx) + '<span class="highlight">' + text.slice(idx, idx+query.length) + '</span>' + text.slice(idx+query.length);
+}
+
+const sectionColors = {'Quick Ref':'#1d9bf0',Protocols:'#e74c3c',Splints:'#2ecc71',Medical:'#e67e22'};
+
+function buildSearch() {
+  const container = h('div', {className:'search-container'});
+  const row = h('div', {className:'search-row'});
+  const icon = h('span', {className:'search-icon'}, '🔍');
+  const input = h('input', {className:'search-input', type:'text', placeholder:'Search symptoms, injuries, treatments…', autocorrect:'off', autocapitalize:'none'});
+  const clearBtn = h('button', {className:'search-clear', style:'display:none'}, '✕');
+  row.append(icon, input, clearBtn);
+  container.appendChild(row);
+  let resultsBox = null;
+
+  function update() {
+    const q = input.value;
+    clearBtn.style.display = q.length > 0 ? '' : 'none';
+    if (resultsBox) { resultsBox.remove(); resultsBox = null; }
+    if (q.length < 2) return;
+    const results = searchContent(q);
+    resultsBox = h('div', {className:'results-box'});
+    if (!results.length) {
+      resultsBox.appendChild(h('div', {className:'no-results'}, 'No matches for "'+q+'"'));
+    } else {
+      for (const r of results) {
+        const col = sectionColors[r.section] || '#71767b';
+        const item = h('div', {className:'result-item'});
+        const header = h('div', {className:'result-header'});
+        header.appendChild(h('div', {className:'result-title'}, r.title));
+        const badge = h('span', {className:'section-badge', style:'background:'+col+'22'});
+        badge.appendChild(h('span', {className:'section-badge-text', style:'color:'+col}, r.section));
+        header.appendChild(badge);
+        item.appendChild(header);
+        for (const m of r.matches.slice(0,2)) {
+          item.appendChild(h('div', {className:'match-text', html:highlightMatch(m, q)}));
+        }
+        resultsBox.appendChild(item);
+      }
+    }
+    container.appendChild(resultsBox);
+  }
+
+  input.addEventListener('input', update);
+  clearBtn.addEventListener('click', () => { input.value = ''; update(); input.focus(); });
+  return container;
+}
+
+// === CARD BUILDERS ===
+function buildAcronymCard(data) {
+  const card = h('div', {className:'card'});
+  const header = h('div', {className:'card-header'});
+  const titleRow = h('div', {className:'title-row'});
+  titleRow.append(
+    h('div', null, h('div', {className:'card-title'}, data.title), h('div', {className:'card-subtitle'}, data.subtitle)),
+    h('span', {className:'chevron'}, '▸')
+  );
+  header.appendChild(titleRow);
+  const preview = h('div', {className:'letter-preview'}, data.steps.map(s=>s.letter).join(' · '));
+  header.appendChild(preview);
+  card.appendChild(header);
+
+  const body = h('div', {className:'card-body'});
+  if (data.context) body.appendChild(h('div', {className:'context'}, data.context));
+  if (data.mantra) body.appendChild(h('div', {className:'mantra'}, data.mantra));
+
+  for (const step of data.steps) {
+    const row = h('div', {className:'letter-row'});
+    row.append(
+      h('div', {className:'letter-badge'}, h('span', {className:'letter-text'}, step.letter)),
+      h('div', {style:'flex:1'}, h('div', {className:'step-word'}, step.word), h('div', {className:'step-summary'}, step.summary)),
+      h('span', {className:'letter-chevron'}, '▸')
+    );
+
+    let detail = null;
+    if (step.detail) {
+      detail = h('div', {className:'letter-detail'});
+      detail.appendChild(h('div', {className:'detail-text'}, step.detail));
+      if (step.warning) {
+        const wb = h('div', {className:'warning-box'});
+        wb.appendChild(h('div', {className:'warning-text'}, '⚠ ' + step.warning));
+        detail.appendChild(wb);
+      }
+      if (step.techniques) {
+        for (const tech of step.techniques) {
+          const tb = h('div', {className:'technique-box'});
+          tb.append(h('div', {className:'technique-name'}, tech.name), h('div', {className:'technique-use'}, tech.use));
+          for (let i = 0; i < tech.steps.length; i++) {
+            tb.appendChild(h('div', {className:'technique-step'}, (i+1)+'. '+tech.steps[i]));
+          }
+          detail.appendChild(tb);
+        }
+      }
+    }
+
+    row.addEventListener('click', () => {
+      if (!detail) return;
+      const isOpen = detail.classList.contains('open');
+      detail.classList.toggle('open');
+      row.querySelector('.letter-chevron').textContent = isOpen ? '▸' : '▾';
+    });
+
+    body.appendChild(row);
+    if (detail) body.appendChild(detail);
+  }
+
+  card.appendChild(body);
+  header.addEventListener('click', () => {
+    const isOpen = card.classList.contains('open');
+    card.classList.toggle('open');
+    header.querySelector('.chevron').textContent = isOpen ? '▸' : '▾';
+    preview.style.display = isOpen ? '' : 'none';
+  });
+  return card;
+}
+
+function buildProtocolCard(data) {
+  const card = h('div', {className:'card'});
+  const catColors = {trauma:'#e74c3c',cardiac:'#e74c3c',airway:'#e67e22',medical:'#3498db',musculoskeletal:'#2ecc71'};
+  const color = catColors[data.category] || '#71767b';
+
+  const header = h('div', {className:'card-header'});
+  const titleRow = h('div', {className:'title-row'});
+  const titleLeft = h('div', {style:'flex:1'});
+  const titleLine = h('div', {style:'display:flex;align-items:center'});
+  titleLine.appendChild(h('span', {className:'card-title'}, data.title));
+  if (data.category) {
+    const badge = h('span', {className:'badge', style:'background:'+color+'22'});
+    badge.appendChild(h('span', {className:'badge-text', style:'color:'+color}, data.category));
+    titleLine.appendChild(badge);
+  }
+  titleLeft.append(titleLine, h('div', {className:'card-summary'}, data.summary));
+  titleRow.append(titleLeft, h('span', {className:'chevron'}, '▸'));
+  header.appendChild(titleRow);
+  card.appendChild(header);
+
+  const body = h('div', {className:'card-body'});
+
+  if (data.decision_tree) for (const dt of data.decision_tree) {
+    const box = h('div', {className:'decision-box'});
+    box.append(h('div', {className:'decision-q'}, dt.question), h('div', {className:'decision-yes'}, 'YES → '+dt.yes), h('div', {className:'decision-no'}, 'NO → '+dt.no));
+    body.appendChild(box);
+  }
+  if (data.signs) {
+    body.appendChild(h('div', {className:'section-title'}, 'SIGNS'));
+    for (const s of data.signs) body.appendChild(h('div', {className:'bullet'}, '• '+s));
+  }
+  if (data.types) for (const t of data.types) {
+    const row = h('div', {className:'type-row'});
+    row.append(h('div', {className:'type-label'}, t.type), h('div', {className:'type-detail'}, t.cause));
+    if (t.note) row.appendChild(h('div', {className:'type-note'}, t.note));
+    body.appendChild(row);
+  }
+  if (data.burn_assessment) {
+    body.appendChild(h('div', {className:'section-title'}, 'ASSESSMENT'));
+    for (const b of data.burn_assessment) body.appendChild(h('div', {className:'bullet burn-field', html:'<b>'+b.field+':</b> '+b.detail}));
+  }
+  if (data.steps) {
+    body.appendChild(h('div', {className:'section-title'}, 'STEPS'));
+    for (let i = 0; i < data.steps.length; i++) {
+      const row = h('div', {className:'step-row'});
+      row.append(h('div', {className:'step-num'}, h('span', {className:'step-num-text'}, ''+(i+1))), h('div', {className:'step-text'}, data.steps[i]));
+      body.appendChild(row);
+    }
+  }
+  if (data.warnings) {
+    body.appendChild(h('div', {className:'section-title'}, 'WARNINGS'));
+    for (const w of data.warnings) {
+      const wb = h('div', {className:'warning-box'});
+      wb.appendChild(h('div', {className:'warning-text'}, '⚠ '+w));
+      body.appendChild(wb);
+    }
+  }
+  if (data.common_mistakes) {
+    body.appendChild(h('div', {className:'section-title'}, 'COMMON MISTAKES'));
+    for (const m of data.common_mistakes) body.appendChild(h('div', {className:'mistake-text'}, '✗ '+m));
+  }
+  if (data.exceptions) for (const ex of data.exceptions) {
+    const box = h('div', {className:'exception-box'});
+    box.append(h('div', {className:'exception-sit'}, ex.situation), h('div', {className:'exception-act'}, '→ '+ex.action));
+    body.appendChild(box);
+  }
+  if (data.by_location) for (const loc of data.by_location) {
+    const box = h('div', {className:'location-box'});
+    box.append(h('div', {className:'location-name'}, loc.location), h('div', {className:'location-detail'}, loc.detail));
+    body.appendChild(box);
+  }
+  if (data.wilderness_notes) {
+    body.appendChild(h('div', {className:'section-title'}, 'WILDERNESS NOTES'));
+    for (const n of data.wilderness_notes) body.appendChild(h('div', {className:'wild-note'}, '⛰ '+n));
+  }
+  if (data.when_not_to_start) {
+    body.appendChild(h('div', {className:'section-title'}, 'WHEN NOT TO START'));
+    for (const n of data.when_not_to_start) body.appendChild(h('div', {className:'bullet'}, '• '+n));
+  }
+  if (data.evacuate_if) {
+    body.appendChild(h('div', {className:'section-title'}, 'EVACUATE IF'));
+    for (const e of data.evacuate_if) body.appendChild(h('div', {className:'evac-text'}, '🚨 '+e));
+  }
+  if (data.key_insight) {
+    const ib = h('div', {className:'insight-box'});
+    ib.appendChild(h('div', {className:'insight-text'}, '💡 '+data.key_insight));
+    body.appendChild(ib);
+  }
+  if (data.infant_note) {
+    const ib = h('div', {className:'insight-box'});
+    ib.appendChild(h('div', {className:'insight-text'}, '👶 '+data.infant_note));
+    body.appendChild(ib);
+  }
+
+  card.appendChild(body);
+  header.addEventListener('click', () => {
+    card.classList.toggle('open');
+    header.querySelector('.chevron').textContent = card.classList.contains('open') ? '▾' : '▸';
+  });
+  return card;
+}
+
+function buildSplintCard(data) {
+  const card = h('div', {className:'card'});
+  const header = h('div', {className:'card-header'});
+  const titleRow = h('div', {className:'title-row'});
+  const titleLeft = h('div', {style:'flex:1'});
+  titleLeft.append(
+    h('div', {className:'card-title'}, data.title),
+    h('div', {className:'splint-injuries'}, data.injuries.join(' · ')),
+    h('div', {className:'card-summary'}, data.summary)
+  );
+  titleRow.append(titleLeft, h('span', {className:'chevron'}, '▸'));
+  header.appendChild(titleRow);
+  card.appendChild(header);
+
+  const body = h('div', {className:'card-body'});
+  if (data.diagram) {
+    const dc = h('div', {className:'diagram-container'});
+    const img = h('img', {src:data.diagram, alt:data.title+' diagram', loading:'lazy'});
+    dc.appendChild(img);
+    dc.appendChild(h('div', {className:'tap-hint'}, 'Tap to zoom'));
+    dc.addEventListener('click', () => openZoom(data.diagram));
+    body.appendChild(dc);
+  }
+  body.appendChild(h('div', {className:'section-title'}, 'STEPS'));
+  for (let i = 0; i < data.steps.length; i++) {
+    const row = h('div', {className:'step-row'});
+    row.append(h('div', {className:'step-num'}, h('span', {className:'step-num-text'}, ''+(i+1))), h('div', {className:'step-text'}, data.steps[i]));
+    body.appendChild(row);
+  }
+  if (data.improvised) {
+    const ib = h('div', {className:'improv-box'});
+    ib.appendChild(h('div', {className:'improv-text'}, '🔧 Improvised: '+data.improvised));
+    body.appendChild(ib);
+  }
+  card.appendChild(body);
+  header.addEventListener('click', () => {
+    card.classList.toggle('open');
+    header.querySelector('.chevron').textContent = card.classList.contains('open') ? '▾' : '▸';
+  });
+  return card;
+}
+
+function buildMedicalCard(data) {
+  const card = h('div', {className:'card'});
+  const header = h('div', {className:'card-header'});
+  const titleRow = h('div', {className:'title-row'});
+  titleRow.append(
+    h('div', {style:'flex:1'}, h('div', {className:'card-title'}, data.title), h('div', {className:'card-subtitle'}, data.subtitle)),
+    h('span', {className:'chevron'}, '▸')
+  );
+  header.appendChild(titleRow);
+  card.appendChild(header);
+
+  const body = h('div', {className:'card-body'});
+  if (data.fast_test) {
+    const fb = h('div', {className:'fast-box'});
+    fb.appendChild(h('div', {className:'section-title'}, 'FAST TEST'));
+    for (const f of data.fast_test) {
+      const row = h('div', {className:'fast-row'});
+      row.append(
+        h('div', {className:'fast-badge'}, h('span', {className:'fast-letter'}, f.letter)),
+        h('div', {style:'flex:1'}, h('div', {className:'fast-word'}, f.word), h('div', {className:'fast-test'}, f.test))
+      );
+      fb.appendChild(row);
+    }
+    body.appendChild(fb);
+  }
+  if (data.signs) {
+    body.appendChild(h('div', {className:'section-title'}, 'SIGNS'));
+    for (const s of data.signs) body.appendChild(h('div', {className:'bullet'}, '• '+s));
+  }
+  const actionSteps = data.treatment || data.steps || [];
+  body.appendChild(h('div', {className:'section-title'}, 'TREATMENT'));
+  for (let i = 0; i < actionSteps.length; i++) {
+    const row = h('div', {className:'step-row'});
+    row.append(h('div', {className:'step-num'}, h('span', {className:'step-num-text'}, ''+(i+1))), h('div', {className:'step-text'}, actionSteps[i]));
+    body.appendChild(row);
+  }
+  if (data.epipen_steps) {
+    const eb = h('div', {className:'epi-box'});
+    eb.appendChild(h('div', {className:'section-title'}, 'EPI-PEN'));
+    for (let i = 0; i < data.epipen_steps.length; i++) {
+      const row = h('div', {className:'step-row'});
+      row.append(h('div', {className:'step-num'}, h('span', {className:'step-num-text'}, ''+(i+1))), h('div', {className:'step-text'}, data.epipen_steps[i]));
+      eb.appendChild(row);
+    }
+    body.appendChild(eb);
+  }
+  if (data.note) {
+    const nb = h('div', {className:'note-box'});
+    nb.appendChild(h('div', {className:'note-text'}, '💡 '+data.note));
+    body.appendChild(nb);
+  }
+  if (data.evacuate_if) {
+    body.appendChild(h('div', {className:'section-title'}, 'EVACUATE IF'));
+    for (const e of data.evacuate_if) body.appendChild(h('div', {className:'evac-text'}, '🚨 '+e));
+  }
+  card.appendChild(body);
+  header.addEventListener('click', () => {
+    card.classList.toggle('open');
+    header.querySelector('.chevron').textContent = card.classList.contains('open') ? '▾' : '▸';
+  });
+  return card;
+}
+
+// === RENDER TABS ===
+function renderQuickRef() {
+  const el = document.getElementById('tab-quickref');
+  el.appendChild(buildSearch());
+  const reassure = h('div', {className:'info-box green'});
+  reassure.append(h('div', {className:'info-title', style:'color:#2ecc71'}, 'Reassurance — LAP'), h('div', {className:'info-text'}, 'Listen · Agree · Positive\nIntroduce yourself. "I know first aid. I will look after you."'));
+  el.appendChild(reassure);
+  const quickIds = ['drsabcd','avpu','soap','sample','4bs'];
+  for (const id of quickIds) {
+    const data = DATA.acronyms.find(a => a.id === id);
+    if (data) el.appendChild(buildAcronymCard(data));
+  }
+  const handover = h('div', {className:'info-box blue'});
+  handover.append(h('div', {className:'info-title', style:'color:#1d9bf0'}, 'Handover to EMS'), h('div', {className:'info-text'}, 'What happened → What you found → What you did'));
+  el.appendChild(handover);
+}
+
+function renderProtocols() {
+  const el = document.getElementById('tab-protocols');
+  for (const p of DATA.protocols) el.appendChild(buildProtocolCard(p));
+}
+
+function renderSplints() {
+  const el = document.getElementById('tab-splints');
+  const flow = h('div', {className:'flow-box'});
+  flow.appendChild(h('div', {className:'flow-title'}, 'Primary Survey Flowchart'));
+  const flowImg = h('img', {src:'diagrams/diagram-primary-survey-flow-clean.jpg', alt:'Primary Survey Flowchart', loading:'lazy'});
+  flowImg.addEventListener('click', () => openZoom('diagrams/diagram-primary-survey-flow-clean.jpg'));
+  flow.append(flowImg, h('div', {className:'tap-hint'}, 'Tap to zoom'));
+  el.appendChild(flow);
+  for (const s of DATA.splinting) el.appendChild(buildSplintCard(s));
+  const attr = h('div', {className:'attribution'});
+  attr.appendChild(h('div', {className:'attribution-text'}, 'Buddy taping: Baedr-9439, CC0 (Wikimedia Commons)'));
+  el.appendChild(attr);
+}
+
+function renderMedical() {
+  const el = document.getElementById('tab-medical');
+  for (const m of DATA.medical_emergencies) el.appendChild(buildMedicalCard(m));
+}
+
+function renderWFR() {
+  const el = document.getElementById('tab-wfr');
+  const hdr = h('div', {className:'header-box'});
+  hdr.append(h('div', {className:'header-title'}, 'WFR Deep Dive'), h('div', {className:'header-text'}, 'US Wilderness First Responder standards.\nMARCH for tactical triage. ABCDEs for systematic assessment.'));
+  el.appendChild(hdr);
+  const march = DATA.acronyms.find(a => a.id === 'march');
+  if (march) el.appendChild(buildAcronymCard(march));
+  el.appendChild(buildAcronymCard(DATA.abcdes));
+}
+
+// === TAB NAVIGATION ===
+const tabs = document.querySelectorAll('.tab-btn');
+const panels = document.querySelectorAll('.tab-content');
+
+tabs.forEach(btn => {
+  btn.addEventListener('click', () => {
+    tabs.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    panels.forEach(p => p.style.display = 'none');
+    document.getElementById('tab-' + btn.dataset.tab).style.display = '';
+  });
+});
+
+// === INIT ===
+renderQuickRef();
+renderProtocols();
+renderSplints();
+renderMedical();
+renderWFR();
+
+// === SERVICE WORKER ===
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>
