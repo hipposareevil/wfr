@@ -14,7 +14,11 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0f1419;color:#e7e9ea}
 #app{display:flex;flex-direction:column;height:100%;height:100dvh}
-.tab-content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 0 0}
+.tab-content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 0 0;zoom:var(--zoom,1)}
+.font-sizer{display:flex;justify-content:flex-end;align-items:center;gap:2px;padding:4px 16px 0;background:#0f1419}
+.font-sizer button{width:36px;height:30px;border:1px solid #2f3336;background:#1a1f25;color:#e7e9ea;font-weight:700;border-radius:8px;cursor:pointer;font-size:14px}
+.font-sizer button:active{background:#2f3336}
+.font-sizer .fs-label{font-size:11px;color:#71767b;margin-right:4px}
 .tab-content>:last-child{margin-bottom:40px}
 .tab-bar{display:flex;border-top:1px solid #2f3336;background:#15181c;padding-bottom:env(safe-area-inset-bottom,0)}
 .tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 0 6px;border:none;background:none;color:#71767b;font-size:9px;font-weight:600;cursor:pointer}
@@ -150,6 +154,12 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
 </head>
 <body>
 <div id="app">
+  <div class="font-sizer">
+    <span class="fs-label">Size</span>
+    <button id="fs-down">A-</button>
+    <button id="fs-reset">A</button>
+    <button id="fs-up">A+</button>
+  </div>
   <div id="tab-quickref" class="tab-content"></div>
   <div id="tab-protocols" class="tab-content" style="display:none"></div>
   <div id="tab-splints" class="tab-content" style="display:none"></div>
@@ -734,6 +744,21 @@ renderProtocols();
 renderSplints();
 renderMedical();
 renderWFR();
+
+// === FONT SIZER ===
+const ZOOM_STEPS = [0.85, 0.9, 1, 1.1, 1.2, 1.35, 1.5];
+let zoomIdx = ZOOM_STEPS.indexOf(1);
+const saved = localStorage.getItem('fs-zoom');
+if (saved) { const si = ZOOM_STEPS.indexOf(parseFloat(saved)); if (si !== -1) zoomIdx = si; }
+function applyZoom() {
+  const z = ZOOM_STEPS[zoomIdx];
+  document.documentElement.style.setProperty('--zoom', z);
+  localStorage.setItem('fs-zoom', z);
+}
+applyZoom();
+document.getElementById('fs-up').onclick = () => { if (zoomIdx < ZOOM_STEPS.length - 1) { zoomIdx++; applyZoom(); } };
+document.getElementById('fs-down').onclick = () => { if (zoomIdx > 0) { zoomIdx--; applyZoom(); } };
+document.getElementById('fs-reset').onclick = () => { zoomIdx = ZOOM_STEPS.indexOf(1); applyZoom(); };
 
 // === SERVICE WORKER ===
 if ('serviceWorker' in navigator) {
