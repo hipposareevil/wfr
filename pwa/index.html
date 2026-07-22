@@ -14,7 +14,8 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0f1419;color:#e7e9ea}
 #app{display:flex;flex-direction:column;height:100%;height:100dvh}
-.tab-content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 0 0;zoom:var(--zoom,1)}
+.tab-content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.tab-inner{padding:12px 0 0;transform-origin:top left;will-change:transform}
 .font-sizer{display:flex;justify-content:flex-end;align-items:center;gap:2px;padding:4px 16px 0;background:#0f1419}
 .font-sizer button{width:36px;height:30px;border:1px solid #2f3336;background:#1a1f25;color:#e7e9ea;font-weight:700;border-radius:8px;cursor:pointer;font-size:14px}
 .font-sizer button:active{background:#2f3336}
@@ -746,13 +747,24 @@ renderMedical();
 renderWFR();
 
 // === FONT SIZER ===
+// Wrap each tab's children in a .tab-inner div for transform scaling
+document.querySelectorAll('.tab-content').forEach(tab => {
+  const inner = document.createElement('div');
+  inner.className = 'tab-inner';
+  while (tab.firstChild) inner.appendChild(tab.firstChild);
+  tab.appendChild(inner);
+});
+
 const ZOOM_STEPS = [0.85, 0.9, 1, 1.1, 1.2, 1.35, 1.5];
 let zoomIdx = ZOOM_STEPS.indexOf(1);
 const saved = localStorage.getItem('fs-zoom');
 if (saved) { const si = ZOOM_STEPS.indexOf(parseFloat(saved)); if (si !== -1) zoomIdx = si; }
 function applyZoom() {
   const z = ZOOM_STEPS[zoomIdx];
-  document.documentElement.style.setProperty('--zoom', z);
+  document.querySelectorAll('.tab-inner').forEach(el => {
+    el.style.transform = 'scale(' + z + ')';
+    el.style.width = (100 / z) + '%';
+  });
   localStorage.setItem('fs-zoom', z);
 }
 applyZoom();
