@@ -746,8 +746,8 @@ renderMedical();
 renderWFR();
 
 // === FONT SIZER ===
-const ZOOM_STEPS = [13, 14, 16, 18, 20, 22, 24];
-let zoomIdx = ZOOM_STEPS.indexOf(16);
+const ZOOM_STEPS = [14, 16, 18, 20, 22, 24, 26];
+let zoomIdx = ZOOM_STEPS.indexOf(18);
 const saved = localStorage.getItem('fs-zoom');
 if (saved) { const si = ZOOM_STEPS.indexOf(parseInt(saved)); if (si !== -1) zoomIdx = si; }
 function applyZoom() {
@@ -758,7 +758,7 @@ function applyZoom() {
 applyZoom();
 document.getElementById('fs-up').onclick = () => { if (zoomIdx < ZOOM_STEPS.length - 1) { zoomIdx++; applyZoom(); } };
 document.getElementById('fs-down').onclick = () => { if (zoomIdx > 0) { zoomIdx--; applyZoom(); } };
-document.getElementById('fs-reset').onclick = () => { zoomIdx = ZOOM_STEPS.indexOf(16); applyZoom(); };
+document.getElementById('fs-reset').onclick = () => { zoomIdx = ZOOM_STEPS.indexOf(18); applyZoom(); };
 
 // === SERVICE WORKER ===
 if ('serviceWorker' in navigator) {
